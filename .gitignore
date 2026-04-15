@@ -180,12 +180,12 @@ UPDATE.md
 EXPLORER_PAGE_LAYOUT.md
 EXPLORER_PLAN.md
 CHART_LIBRARY_REDESIGN.md
-CLAUDE.md
 PLANS.md
 GENERATOR_PLAN.md
 TODO_TRANSPORT.md
 TODO.md
 WEEKEND.md
+CLAUDE.md
 .vscode/
 layerchart_docs/
 *storybook.log
@@ -194,5 +194,12 @@ archive/
 chrome
 .playwright-mcp
 LAST_PLAN.md
+FINISH_LINE.md
+FINISH_LINE_DONE.md
+FEEDBACK_*.md
 .vscode
 .tmp
+
+# Claude Code local tool settings (contains local permission grants, not secrets,
+# but not useful in a public repo and could accumulate machine-specific state).
+.claude/
