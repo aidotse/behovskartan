@@ -24,7 +24,10 @@ const config = {
 		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: adapter(),
+		// fallback: '404.html' emits a SPA shell that CloudFront serves for
+		// unknown paths (via 403/404 → /404.html error responses). The SvelteKit
+		// client then hydrates at the requested URL and renders +error.svelte.
+		adapter: adapter({ fallback: '404.html' }),
 		alias: {
 			$paraglide: './src/lib/paraglide'
 		},

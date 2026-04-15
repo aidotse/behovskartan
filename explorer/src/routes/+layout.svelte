@@ -5,6 +5,7 @@
 	import { settings } from 'svelte-ux';
 	import { untrack } from 'svelte';
 	import TopNavigationBar from '$lib/components/navigation/TopNavigationBar.svelte';
+	import NavigationProgress from '$lib/components/navigation/NavigationProgress.svelte';
 	import PersistentDesktopMap from '$lib/components/map/PersistentDesktopMap.svelte';
 	import { scenarioState } from '$lib/stores/scenario.svelte';
 	import { parameterStore } from '$lib/stores/parameterStore.svelte';
@@ -102,6 +103,9 @@
 </svelte:head>
 
 <ParaglideJS {i18n}>
+	<!-- Top-of-page progress bar while SvelteKit is running a page load -->
+	<NavigationProgress />
+
 	<!-- Navigation -->
 	<TopNavigationBar />
 

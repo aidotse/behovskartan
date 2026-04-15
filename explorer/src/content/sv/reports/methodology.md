@@ -73,7 +73,7 @@ datacenter efter inventering av planerade och befintliga anläggningar, och tran
 efter regionala elektrifieringsscenarier.
 
 Läs mer om den regionala nedbrytningen på Energimyndighetens sida
-[Framtida elbehov i ditt län](https://www.energimyndigheten.se/framtida-elbehov-i-ditt-lan/).
+<a href="https://www.energimyndigheten.se/framtida-elbehov-i-ditt-lan/" target="_blank" rel="noopener">Framtida elbehov i ditt län</a>.
 
 ## Steg 2: Från femårsdata till årsdata
 
@@ -120,7 +120,8 @@ hur förbrukningen fördelar sig över dygnets 24 timmar.
 
 #### Bostäder
 
-Baserad på uppmätt timdata från svenska energibolag (Skövderegionen, 2024). Profilen
+Baserad på uppmätt timdata och lastprofiler från <a href="https://www.goteborgenergi.se/" target="_blank" rel="noopener">Göteborg Energi</a>
+och <a href="https://skovdeenergi.se/" target="_blank" rel="noopener">Skövde Energi</a> (2024). Profilen
 visar tydliga morgon- och kvällstoppar när hushållen är som mest aktiva — matlagning,
 belysning, hushållsapparater. Vintermånaderna har högre total förbrukning på grund av
 uppvärmning (värmepumpar, direktverkande el). Dygnsrytmen följer ett förutsägbart
@@ -129,14 +130,16 @@ kvällstopp kring kl 17–19. Helger har en något förskjuten morgonstart.
 
 #### Service
 
-Från samma datakälla (SNI-kod D–K, M–N, S: kontor, handel, sjukvård, skolor).
+Baserad på uppmätt timdata och lastprofiler från <a href="https://www.goteborgenergi.se/" target="_blank" rel="noopener">Göteborg Energi</a>
+och <a href="https://skovdeenergi.se/" target="_blank" rel="noopener">Skövde Energi</a> (SNI-kod D–K, M–N, S: kontor, handel, sjukvård, skolor).
 Följer kontorstider med topp under dagtid (08–17). Lägre kvällar och helger. Högre
 basbelastning än bostäder — vissa verksamheter körs dygnet runt (sjukhus,
 köpcentrum). Kylbehov ger en sommarkomponent i vissa fastigheter.
 
 #### Industri
 
-Uppmätt data för tillverkningsindustri (SNI C). Relativt jämn profil som speglar
+Baserad på uppmätt timdata och lastprofiler från <a href="https://www.goteborgenergi.se/" target="_blank" rel="noopener">Göteborg Energi</a>
+och <a href="https://skovdeenergi.se/" target="_blank" rel="noopener">Skövde Energi</a> för tillverkningsindustri (SNI C). Relativt jämn profil som speglar
 kontinuerlig drift. Skiftmönster syns men dygnsvariationen är mindre än för bostäder.
 Hög basbelastning — processindustrier körs dygnet runt. Veckoprofilen visar svag
 minskning på helger för icke-kontinuerliga verksamheter.
@@ -157,6 +160,7 @@ Sammansatt profil av tre delsegment, viktade efter årlig energianvändning:
 
 #### Datacenter
 
+Baserad på lastkurvor bidragna av <a href="https://www.airon.ai/" target="_blank" rel="noopener">Airon</a>.
 Nästan helt jämn profil dygnet runt, året runt — servrar körs 24/7 oavsett tid eller
 dag. Den enda variationen kommer från kylning: under sommarmånaderna (juni–augusti)
 skapar kompressorbaserad kylning ett temperaturföljande mönster med topp kring kl 13.

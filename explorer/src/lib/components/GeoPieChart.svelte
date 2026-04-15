@@ -346,7 +346,7 @@
 				</div>
 			</div>
 
-			<div class="hidden sm:flex flex-col items-center justify-center self-center gap-1.5 px-2 py-4 min-w-[110px]">
+			<div class="hidden sm:flex flex-col items-start justify-center self-center gap-1.5 px-2 py-4 min-w-[110px]">
 				{#each deltas as delta}
 					<div class="flex items-center gap-1.5 text-xs whitespace-nowrap">
 						<span

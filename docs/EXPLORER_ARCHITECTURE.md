@@ -80,50 +80,18 @@ Explorer is a **modular visual framework** for communicating energy forecast dat
 ```
 
 **Content Management**:
-```
-/explorer/src/content/
-├── sv/                        # Swedish content
-│   ├── introduction.md
-│   ├── executive-summary.md
-│   ├── current-state.md
-│   ├── future-scenarios.md
-│   └── key-insights.md
-├── en/                        # English content
-│   ├── introduction.md
-│   ├── executive-summary.md
-│   ├── current-state.md
-│   ├── future-scenarios.md
-│   └── key-insights.md
-└── explainers/                # Explainer snippets
-    ├── geography.md
-    ├── flex.md
-    └── ...
-```
+
+Markdown/MDsveX content files live under `/explorer/src/content/{locale}/{section}/`. Only the Swedish locale (`sv/`) is currently populated, with subsections for `pages/` and `reports/`. The `:::Component{props}` directive syntax is transformed into Svelte components by `src/lib/remark/directivePreprocess.js`; see CLAUDE.md for the MDsveX gotchas and how to opt into the `reports` layout.
 
 **Component Organization**:
-```
-/explorer/src/lib/components/
-├── AreaChart.svelte           # Time series area charts
-├── Histogram.svelte           # Distribution histograms
-├── SegmentBars.svelte         # Sector breakdown bar charts
-├── TimeLine.svelte            # Daily/weekly timeline charts
-├── GeoBarChart.svelte         # Geographic comparison bar charts
-├── map/
-│   ├── Map.svelte             # Main map component (wrapper)
-│   ├── MapBox.svelte          # Mapbox GL map implementation
-│   ├── Legend.svelte          # Map legend and controls
-│   ├── YearSelect.svelte      # Year selector control
-│   └── Popup.svelte           # County popup component
-├── inline/
-│   └── Change.svelte          # Inline percentage/absolute change
-└── shared/
-    ├── LoadingSkeleton.svelte # Reusable loading states (i18n via Paraglide)
-    ├── ErrorState.svelte      # Reusable error displays (i18n via Paraglide)
-    ├── LazyChart.svelte       # Intersection Observer lazy loading (i18n via Paraglide)
-    ├── ChartContainer.svelte  # Chart wrapper with export menu
-    ├── ScenarioLegend.svelte  # Interactive comparison legend
-    └── EmptyState.svelte      # Reusable empty data states
-```
+
+See `/explorer/src/lib/components/` for the current component tree. Key groupings:
+
+- Chart components at the top level (`AreaChart.svelte`, `Histogram.svelte`, `TimeLine.svelte`, `SegmentBars.svelte`, etc.) — all wrap LayerChart primitives.
+- `map/` — Mapbox GL wrapper (`Map.svelte`, `MapBox.svelte`, `Legend.svelte`, `Popup.svelte`, `YearSelect.svelte`) plus `PersistentDesktopMap.svelte` which keeps the desktop map mounted across route changes.
+- `shared/` — reusable loading/error/empty states, lazy loading via intersection observer, chart container with export menu.
+- `content/` — `ContentShell.svelte` page wrapper, MDsveX layouts (`MarkdownLayout.svelte`, `ReportLayout.svelte`).
+- `navigation/`, `layout/`, `report/` — page chrome and report-specific UI.
 
 ## Component Standardization
 
@@ -205,24 +173,15 @@ const geoData = await fetchDemandData(geoQuery, fetch);
 
 ## Content Management System
 
-**Status**: ✅ Core system implemented
+Explorer uses a markdown/MDsveX-based content system so narrative text lives outside component code. Content files sit at `/explorer/src/content/{locale}/{section}/*.{md,svx}`; today only `sv/` is populated (`pages/`, `reports/`).
 
-Explorer includes a markdown-based content management system for maintaining narrative text, explanations, and documentation.
+**Key pieces**:
+- `src/lib/contentLoader.ts` — loads files via Vite glob, resolves by slug + locale, caches results.
+- `src/lib/components/content/ContentShell.svelte` — the reusable page wrapper used by thin route files (`<ContentShell slug="pages/about" />`).
+- `src/lib/components/content/MarkdownLayout.svelte` and `ReportLayout.svelte` — MDsveX named layouts. Opt into the reports layout with `layout: reports` in a `.svx` file's frontmatter.
+- `src/lib/remark/directivePreprocess.js` — Svelte preprocessor that transforms `:::Component{props}` syntax into `<Component>` with auto-imports. Runs before MDsveX. This is used instead of `remark-directive` because MDsveX 0.11.x bundles an old unified version (see CLAUDE.md for details).
 
-**Architecture**:
-```
-/explorer/
-├── src/
-│   ├── content/                    # Markdown content files (application data)
-│   │   ├── sv/                     # Swedish content
-│   │   │   └── introduction.md
-│   │   └── en/                     # English content
-│   └── lib/
-│       ├── contentLoader.ts        # Content loading with caching
-│       └── components/content/
-│           ├── ContentBlock.svelte # Markdown renderer
-│           └── MarkdownLayout.svelte # MDsveX layout wrapper
-```
+Simple pages live as `.md` with directive syntax; pages with loops/icons/state stay as `.svx`.
 
 ## Development Workflow
 
@@ -250,120 +209,3 @@ npm run preview                # Preview production build locally
 - Test responsiveness at multiple breakpoints
 - Document complex data transformations
 - Keep components under 300 lines (split if larger)
-## Content Management System
-
-**Overview**:
-The Explorer uses a markdown-based content system with frontmatter support to separate narrative content from code. This enables non-technical users to update text, descriptions, and titles without modifying component code.
-
-**Key Components**:
-- **MDsveX**: Markdown preprocessor for Svelte that compiles `.md` files into Svelte components
-- **contentLoader.ts**: Dynamic content loading system with caching
-- **MarkdownLayout.svelte**: Layout wrapper for rendered markdown content
-- **Frontmatter metadata**: YAML metadata at the top of markdown files
-
-**Architecture**:
-```typescript
-// Content file structure (markdown with frontmatter)
----
-title: "Page Title"
-description: "Page description"
-section: "section-name"
-order: 1
-lastUpdated: "2025-10-20"
-tags: ["tag1", "tag2"]
----
-
-## Page Title
-
-Your narrative text here. The content starts with h2 (matching the frontmatter title).
-
-### Subsection
-
-Use h3 for subsections, h4 for sub-subsections...
-```
-
-**Loading Content**:
-```typescript
-// In page loaders (+page.ts)
-import { loadContent } from '$lib/contentLoader';
-
-export const load: PageLoad = async () => {
-  const content = await loadContent('sv', 'executive-summary');
-  
-  return {
-    content: {
-      component: content?.default,      // Svelte component
-      metadata: content?.metadata        // Frontmatter data
-    }
-  };
-};
-```
-
-**Rendering Content**:
-```svelte
-<!-- In Svelte components -->
-<script>
-  let { data } = $props();
-</script>
-
-<!-- Use metadata for dynamic titles -->
-<h1>{data.content.metadata?.title || 'Fallback Title'}</h1>
-<p>{data.content.metadata?.description}</p>
-
-<!-- Render markdown as component -->
-<div class="prose">
-  <svelte:component this={data.content.component} />
-</div>
-```
-
-**Content Structure**:
-- Content files organized by locale (`sv/`, `en/`) in `/src/content/`
-- Each file represents a section of narrative content
-- Frontmatter provides metadata (title, description, tags, order)
-- Markdown body starts with `## Title` (h2) matching frontmatter title
-- Subsections use `###` (h3), sub-subsections use `####` (h4)
-- Never use `#` (h1) in markdown content
-- Frontmatter metadata is accessed programmatically in page loaders
-
-**Caching**:
-- Loaded content is cached in memory for performance
-- Cache can be cleared with `clearContentCache()`
-- Use `getCachedContent()` to retrieve without loading
-
-**Benefits**:
-- **Separation of Concerns**: Content separate from presentation logic
-- **Easy Updates**: Update narrative without touching code
-- **Type Safety**: TypeScript interfaces for metadata
-- **i18n Ready**: Organized by locale for multi-language support
-- **Performance**: In-memory caching for fast access
-- **Future-Proof**: New scenario parameters? Just update markdown!
-
-**Testing**:
-- Comprehensive test suite in `contentLoader.test.ts`
-- Tests cover loading, caching, metadata extraction, and error handling
-- 19 tests ensuring all content files load correctly
-
-**Configuration**:
-MDsveX is configured in `svelte.config.js`:
-```javascript
-preprocess: [
-  vitePreprocess(),
-  mdsvex({
-    extensions: [".svx", ".md"],
-    layout: {
-      _: './src/lib/components/content/MarkdownLayout.svelte'
-    }
-  })
-]
-```
-
-**Best Practices**:
-- Keep markdown files focused on content, not layout
-- Use consistent frontmatter fields across all files
-- **Content structure**: Start with `## Title` (h2), subsections use `###` (h3)
-- **Never use `#` (h1)** in markdown - h1 is reserved for page-level titles
-- The h2 title should match the frontmatter `title` field
-- Update `lastUpdated` when modifying content
-- Use descriptive `section` identifiers
-- Add relevant tags for future filtering/searching
-- Keep content files under 200 lines for maintainability

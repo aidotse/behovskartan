@@ -46,6 +46,15 @@
 }
 ```
 
+## Performance
+
+- **Response compression**: `compression` middleware is applied globally (`api/local-server.js` — `app.use(compression())`), so JSON responses are gzip/deflated for supported clients. The `Vary: Accept-Encoding` header is set.
+- **HTTP caching**: Static endpoints use file-stat ETags (304 on `If-None-Match`). `/demand` responses are keyed by a hash of the normalized query plus server start time; both paths set `Cache-Control: public, max-age=300`.
+- **In-process LRU cache**: `/demand` results are memoized via `api/cache.js`; stats are exposed at `/_health`.
+- **Rate limiting**: `/demand` is rate-limited to 300 req/min/IP by default (`express-rate-limit`). Override with `RATE_LIMIT_WINDOW_MS` and `RATE_LIMIT_MAX` env vars. Other endpoints are cheap (static files) and not rate-limited.
+- **Query path observability**: The `/demand` handler sets `req.queryPath` (e.g., `raw_scan`) which is emitted in the structured access log line as `query_path`, so you can tell which SQL strategy actually ran.
+- **Cache warmup**: On startup, `warmupCache()` pre-computes common yearly aggregations for all base scenarios (2025–2050) to eliminate cold-start latency on the first request.
+
 ## Common Commands
 
 ### API Server

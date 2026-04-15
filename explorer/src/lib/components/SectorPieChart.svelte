@@ -661,7 +661,7 @@
 
 				<!-- Delta column (between pies, visible on sm+) -->
 				<div
-					class="hidden sm:flex flex-col items-center justify-center self-center gap-1.5 px-1 py-4 min-w-[96px]"
+					class="hidden sm:flex flex-col items-start justify-center self-center gap-1.5 px-1 py-4 min-w-[96px]"
 				>
 					{#each deltas as delta}
 						<div class="flex items-center gap-1.5 text-xs whitespace-nowrap">

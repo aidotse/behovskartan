@@ -197,6 +197,8 @@ LAST_PLAN.md
 FINISH_LINE.md
 FINISH_LINE_DONE.md
 FEEDBACK_*.md
+# Handover tarball companion doc — ships inside the private tarball only
+PRIVATE_FILES.md
 .vscode
 .tmp
 

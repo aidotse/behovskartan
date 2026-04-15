@@ -1,21 +1,41 @@
 ---
 title: 'Om projektet'
-description: 'Ett verktyg för att utforska och visualisera Sveriges framtida elbehov'
+description: 'Behovskartan — ett verktyg för att utforska scenarier för Sveriges framtida elbehov, utvecklat av AI Sweden med finansiering från Energimyndigheten'
 layout: reports
 ---
 
-Behovskartan är ett interaktivt verktyg för att utforska scenarier för Sveriges
-framtida elbehov. Verktyget visualiserar hur elanvändningen kan utvecklas fram
-till 2050 — uppdelat på regioner, sektorer och tid.
+## Syfte
 
-Syftet är att göra energiscenarier mer tillgängliga. Genom att jämföra olika
-utvecklingsbanor kan användare förstå osäkerheterna och se hur olika antaganden
-påverkar resultatet. Verktyget riktar sig till beslutsfattare, energianalytiker,
-nätplanerare och alla som arbetar med Sveriges energiomställning.
+Verktyget underlättar diskussioner mellan industri, kommuner, regioner,
+myndigheter och allmänhet kring framtidens elsystem. Syftet är att stödja
+informerade beslut, minska affärsrisker för svensk industri och främja den
+gröna omställningen genom en gemensam, neutral bild av elbehovet.
 
----
+## Bakgrund
 
-_Denna sida är under arbete. Filip — fyll på med mer information om projektet, bakgrund och metodik._
+Fas 1 av initiativet identifierade behovet av en neutral nationell plattform
+för energi- och nätrelaterad modellering och scenarioanalys. Fas 2
+realiserade den plattformen: ett användarvänligt verktyg med förbättrad
+funktionalitet, förbättrade modeller samt högre kapacitet och säkerhet
+jämfört med prototypen.
+
+## Vad verktyget gör
+
+Användaren kan variera parametrar som elektrifiering av transportsektorn och
+industrins gröna omställning, och se effekterna på effektbehovet nationellt
+och regionalt. Scenarier kan studeras på olika geografiska nivåer — från
+hela landet ner till region och kommun. Projektet adresserade även frågor
+kring datasäkerhet och datadelning.
+
+## Resultat
+
+Resultatet är ett färdigställt digitalt verktyg för visualisering och
+simulering av Sveriges framtida elbehov, tillsammans med en analys för
+långsiktig förvaltning och drift av verktyget.
+
+## Finansiering och deltagare
+
+Finansiering: Energimyndigheten. Deltagare: AI Sweden och Energimyndigheten.
 
 ---
 

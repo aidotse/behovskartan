@@ -4,29 +4,41 @@
 
 The project deploys to AWS using GitHub Actions with OIDC authentication (no stored AWS keys).
 
-| Component | Service | URL |
-|-----------|---------|-----|
-| API | App Runner | `https://vwf7sd26hy.eu-central-1.awsapprunner.com` |
-| Explorer | S3 + CloudFront | `https://dk5nqxb38wg76.cloudfront.net` |
+| Component | Service |
+|-----------|---------|
+| API | App Runner (one service per environment) |
+| Explorer | S3 + CloudFront (one bucket + distribution per environment) |
+
+URLs, ARNs, and bucket names live in GitHub Actions environment variables — see `gh variable list --env staging` / `--env production`. The canonical production API is `https://api.behovskartan.se` and the production Explorer is served from its own CloudFront distribution.
 
 ## How to Deploy
 
-### Automatic (push to `production`)
+The project has **two deployment branches**: `staging` and `production`. Pushing to either triggers `.github/workflows/deploy.yml`, which picks the environment based on the ref. Staging is the default path — merge `main` → `staging`, verify, then merge `staging` → `production`.
+
+### Staging
+
+```bash
+git checkout staging
+git merge main
+git push origin staging
+```
+
+### Production
 
 ```bash
 git checkout production
-git merge main
+git merge staging   # (or main, if staging is up to date)
 git push origin production
 ```
 
-This triggers the full pipeline: build API image → deploy to App Runner → build Explorer → deploy to S3 → invalidate CloudFront cache.
+Either push runs the full pipeline: build API image → deploy to App Runner → build Explorer → sync to S3 → invalidate CloudFront cache.
 
 ### Manual (workflow dispatch)
 
-Go to **Actions → Deploy → Run workflow** in GitHub, or:
+Go to **Actions → Deploy → Run workflow** in GitHub and pick `staging` or `production`, or:
 
 ```bash
-gh workflow run deploy.yml --ref production -f environment=dev
+gh workflow run deploy.yml --ref staging -f environment=staging
 ```
 
 ## Pipeline
@@ -43,20 +55,34 @@ The workflow (`.github/workflows/deploy.yml`) runs three sequential jobs:
 |--------|---------|
 | `main` | Development integration branch |
 | `feature/*` | Feature branches, merged to `main` via PR |
-| `production` | Deployment trigger — merge `main` here when ready to ship |
+| `staging` | Deployment trigger for the staging environment — merge `main` here to test on staging infra |
+| `production` | Deployment trigger for the production environment — merge `staging` here to ship |
 
 ## AWS Infrastructure
 
-All resources are in `eu-central-1` under account `600627346413`.
+All resources live in `eu-central-1`. Each environment (`staging`, `production`) has its own set of resources, suffixed accordingly. The AWS account ID is not hardcoded in the repo — the deploy role ARN is injected via the GitHub Actions variable `AWS_DEPLOY_ROLE_ARN`.
 
-| Resource | Identifier |
-|----------|------------|
-| ECR repository | `behovskartan-api` |
-| App Runner service | `behovskartan-api-dev` |
-| S3 bucket | `behovskartan-explorer-dev` |
-| CloudFront distribution | `E21L0X9B8QHTWX` |
+| Resource | Pattern |
+|----------|---------|
+| ECR repository | `behovskartan-api` (shared; image tagged per commit) |
+| App Runner service | `behovskartan-api-staging`, `behovskartan-api-production` |
+| S3 explorer bucket | `behovskartan-explorer-staging`, `behovskartan-explorer-production` |
+| S3 data bucket | `behovskartan-data-staging`, `behovskartan-data-production` |
+| CloudFront distribution | one per environment (IDs live in GitHub env vars) |
 | OIDC provider | `token.actions.githubusercontent.com` |
 | Deploy role | `behovskartan-github-deploy` |
+
+### API data at runtime
+
+The API Docker image is **not** baked with data. On container startup, `infrastructure/entrypoint.sh` downloads the current data version from `s3://behovskartan-data-{env}/{DATA_VERSION}/` into the container's `/data` directory before starting the Node server. This means:
+
+- Data updates ship by uploading a new version to the data bucket and bumping the `DATA_VERSION` GitHub Actions variable — no image rebuild required.
+- The API needs `S3_DATA_BUCKET` and `DATA_VERSION` env vars set (both are wired in the App Runner service config by the deploy workflow).
+- Local development reads from the repo's `data/` directory directly.
+
+### Explorer 404 handling
+
+CloudFront `CustomErrorResponses` map both 403 and 404 from S3 → `/404.html` with a 404 status. SvelteKit's `adapter-static` is configured with `fallback: '404.html'`, so the build emits an SPA shell at that path; the client router then renders `src/routes/+error.svelte` for unknown URLs. This pattern lives in `infrastructure/setup.sh` for new distributions.
 
 ### Authentication
 
@@ -64,20 +90,24 @@ GitHub Actions authenticates via **OIDC federation** — no AWS access keys are 
 
 ## GitHub Settings
 
-### Environment: `dev`
+### Environments: `staging` and `production`
 
-Variables set via `gh variable set --env dev`:
+Each environment has its own set of variables. List with `gh variable list --env staging` or `--env production`.
 
 | Variable | Description |
 |----------|-------------|
 | `API_URL` | App Runner service URL |
 | `APP_RUNNER_SERVICE_ARN` | App Runner service ARN |
 | `S3_BUCKET_EXPLORER` | S3 bucket for Explorer static files |
+| `S3_DATA_BUCKET` | S3 bucket the API downloads data from at startup |
+| `DATA_VERSION` | Data version prefix inside the data bucket |
 | `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID |
-| `CLOUDFRONT_DOMAIN` | CloudFront domain name |
+| `CLOUDFRONT_DOMAIN` | CloudFront domain (custom or `d*.cloudfront.net`) |
 | `ALLOWED_ORIGINS` | CORS allowed origins for the API |
 | `AWS_DEPLOY_ROLE_ARN` | IAM role ARN for OIDC auth |
 | `MAPBOX_STYLE_LIGHT` | Mapbox light theme style URL |
+
+Protection rules on the `production` environment gate the deploy jobs on required reviewers.
 
 ### Repository-level
 

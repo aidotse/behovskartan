@@ -4,6 +4,20 @@
 
 This document provides the sources, methodology, and logic for constructing hourly/monthly electricity load profiles for data centers, with particular focus on Swedish/Nordic conditions. It is designed for Claude Code to use when building load curve models.
 
+## Expected inputs (not distributed)
+
+`create_datacenter_profile.ipynb` reads two files that were shared with this project confidentially and **are not part of the repo**:
+
+- `Airon effektprofiler.xlsx` — sheets `DC` and `PUE25`, daily total power (365 rows) and daily PUE for 1 MW reserved blocks across three datacenter types (colocation air-cooled, colocation liquid-cooled, hyperscale liquid-cooled).
+- `Effektprofiler AI Sweden.pdf` — accompanying documentation from the data provider.
+
+Forkers can substitute their own data by producing an Excel file with the same shape, or by rewriting the first cells of the notebook to read from public sources. Reasonable public substitutes for Nordic conditions:
+- LBNL "2024 United States Data Center Energy Usage Report" — aggregate PUE and load-factor figures.
+- PG&E "Large Load Forecasting" (June 2025) — hourly and seasonal shapes.
+- Green Mountain / atNorth public PUE reports — Nordic free-cooling baselines.
+
+The shipped `../profile_datacenters_2025.csv` and `../profile_datacenters_patterns.json` are the normalized outputs of this notebook and are safe to use directly without rerunning the pipeline.
+
 ---
 
 ## Executive Summary

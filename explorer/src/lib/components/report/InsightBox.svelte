@@ -58,7 +58,7 @@
 </script>
 
 <div
-	class="insight-box rounded border-l-4 px-5 py-4 lg:px-8 lg:py-7 {config.bgClass} {config.borderClass} {className}"
+	class="insight-box rounded border-l-4 px-5 py-3 lg:px-8 lg:py-4 {config.bgClass} {config.borderClass} {className}"
 >
 	<div>
 		{#if title}

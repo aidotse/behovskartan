@@ -2,6 +2,12 @@
 
 This folder contains normalized hourly load profiles for each segment.
 
+## Shipped base profiles vs. raw inputs
+
+The repo ships with pre-generated, normalized profiles (`profile_*_2024.csv`, `profile_*_2025.csv`, and the corresponding `*_patterns.json` files). These are the "base profiles" the generator consumes directly — a fresh fork of this repo can run the generator end-to-end without any private data.
+
+The subfolders `datacenters/`, `energy_company_profiles/`, `transport_truck_profiles/`, `transport_car_profiles/`, and `transport_rail_profiles/` contain the notebooks that built those profiles from source data shared confidentially by external parties. **The raw source files are not distributed with this repo** (they are gitignored). The notebooks remain as methodology documentation: each subfolder's README describes the expected input schema and points to public substitutes a forker can use to regenerate profiles with their own data.
+
 ## Expected Files
 
 Each segment needs a parquet file with a normalized hourly profile:
