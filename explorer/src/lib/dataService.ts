@@ -360,6 +360,28 @@ export const fetchGeographies = async (
 };
 
 /**
+ * Derive the flat `{id, name, type}[]` metadata list from a geojson feature
+ * collection so callers don't need a separate `/geographies?format=json` fetch.
+ * Matches the shape returned by the API's json format (sorted by id ascending).
+ */
+export function deriveGeographiesFromGeojson(
+	geojson: GeoJsonFeatureCollection
+): Array<{ id: string; name: string; type?: string }> {
+	const list: Array<{ id: string; name: string; type?: string }> = [];
+	for (const f of geojson.features || []) {
+		const props = (f.properties || {}) as Record<string, unknown>;
+		const id = props.geo_id;
+		const name = props.geo_name;
+		const type = props.geo_type;
+		if (typeof id === 'string' && typeof name === 'string') {
+			list.push({ id, name, type: typeof type === 'string' ? type : undefined });
+		}
+	}
+	list.sort((a, b) => a.id.localeCompare(b.id));
+	return list;
+}
+
+/**
  * Fetch available aggregations from /aggregations endpoint
  * @param customFetch - Optional fetch function (for SvelteKit SSR compatibility)
  */

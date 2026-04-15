@@ -3,6 +3,7 @@ import {
 	fetchConfig,
 	fetchGlobals,
 	fetchGeographies,
+	deriveGeographiesFromGeojson,
 	fetchDemandData
 } from '$lib/dataService';
 import { makeDemandQuery } from '$lib/utilities';
@@ -27,22 +28,18 @@ export const load: PageLoad = async ({ fetch, parent }) => {
 		// Scenarios + parameters come from the layout loader — don't refetch.
 		const { scenarios, parameters } = await parent();
 
-		// Fetch page-specific data in parallel
-		const [
-			configResult,
-			globalsResult,
-			geographiesResult,
-			geojsonResult
-		] = await Promise.all([
+		// Fetch page-specific data in parallel. The json-format geographies list
+		// is derived from the geojson features below so we don't need a second
+		// request for the same metadata.
+		const [configResult, globalsResult, geojsonResult] = await Promise.all([
 			fetchConfig(fetch),
 			fetchGlobals(fetch),
-			fetchGeographies('json', fetch),
 			fetchGeographies('geojson', fetch)
 		]);
 		const config = configResult.data;
 		const globals = globalsResult.data;
-		const geographies = geographiesResult.data;
 		const geojson = geojsonResult.data;
+		const geographies = deriveGeographiesFromGeojson(geojson as any);
 
 		// Set initial defaults for controls
 		const year = 2050;
