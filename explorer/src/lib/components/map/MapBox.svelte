@@ -420,29 +420,30 @@
             resizeObserver.observe(mapContainer);
         }
 
-        // Lazy-boot triggers for `instantiateMap()`. Earliest of:
-        //   1. requestIdleCallback (or setTimeout fallback) after ~1.5s —
-        //      booting only once the container is currently visible, so the
-        //      persistent map stays dormant while the user is on /charts.
-        //   2. IntersectionObserver firing when the container scrolls/toggles
-        //      into view (e.g. nav from /charts → /).
-        //   3. pointerenter / pointerdown on the container — user hover/tap
-        //      kicks off boot immediately, no idle wait.
+        // Lazy-boot triggers for `instantiateMap()`. Strategy:
+        //
+        //   1. Primary: requestIdleCallback with a 1500ms timeout (fallback
+        //      setTimeout 800ms). Fires after initial paint + Svelte
+        //      hydration have settled, so `new mapboxgl.Map(...)` doesn't
+        //      block the first-paint critical path.
+        //   2. Hidden-container fallback: if the container is display:none
+        //      at the idle moment (user is on /charts and this is the
+        //      persistent desktop map), bail and install an
+        //      IntersectionObserver that fires on the next visibility
+        //      transition (hidden → visible). We skip the IO's initial
+        //      synchronous callback so we only boot on an actual transition.
+        //   3. User-interaction override: pointerenter / pointerdown on the
+        //      container boots immediately, no wait. Handles the case where
+        //      the user reaches for the map before the idle timer fires.
+        //
+        // An earlier version of this used IntersectionObserver as the
+        // primary trigger, but IO reports the current state synchronously
+        // on observe() — so on / cold load it fired immediately and
+        // bypassed the idle wait entirely. Don't re-introduce that.
         let idleHandle: number | null = null;
         let idleTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
         let io: IntersectionObserver | null = null;
-
-        const tryBoot = () => {
-            if (map) { cleanupTriggers(); return; }
-            // offsetParent === null means the element (or an ancestor) has
-            // display:none — don't pay the boot cost while the persistent
-            // desktop map is hidden behind /charts.
-            if (mapContainer.offsetParent === null) return;
-            instantiateMap();
-            cleanupTriggers();
-        };
-
-        const onPointer = () => { instantiateMap(); cleanupTriggers(); };
+        let ioSeenInitial = false;
 
         const cleanupTriggers = () => {
             if (idleHandle != null && 'cancelIdleCallback' in window) {
@@ -457,15 +458,38 @@
             mapContainer.removeEventListener('pointerdown', onPointer);
         };
 
-        mapContainer.addEventListener('pointerenter', onPointer, { once: true });
-        mapContainer.addEventListener('pointerdown', onPointer, { once: true });
-
-        if ('IntersectionObserver' in window) {
+        const installVisibilityObserver = () => {
+            if (io || !('IntersectionObserver' in window)) return;
             io = new IntersectionObserver((entries) => {
-                if (entries.some((e) => e.isIntersecting)) tryBoot();
+                // Skip the initial synchronous observation — we only want
+                // to fire on a real hidden → visible transition.
+                if (!ioSeenInitial) { ioSeenInitial = true; return; }
+                if (entries.some((e) => e.isIntersecting)) {
+                    if (map) { cleanupTriggers(); return; }
+                    instantiateMap();
+                    cleanupTriggers();
+                }
             }, { threshold: 0.1 });
             io.observe(mapContainer);
-        }
+        };
+
+        const tryBoot = () => {
+            if (map) { cleanupTriggers(); return; }
+            // Hidden (display:none) — don't pay the boot cost yet. Install
+            // an IntersectionObserver to wait for a visibility transition
+            // so we boot exactly when the user navigates to the map.
+            if (mapContainer.offsetParent === null) {
+                installVisibilityObserver();
+                return;
+            }
+            instantiateMap();
+            cleanupTriggers();
+        };
+
+        const onPointer = () => { instantiateMap(); cleanupTriggers(); };
+
+        mapContainer.addEventListener('pointerenter', onPointer, { once: true });
+        mapContainer.addEventListener('pointerdown', onPointer, { once: true });
 
         if ('requestIdleCallback' in window) {
             idleHandle = (window as any).requestIdleCallback(() => tryBoot(), { timeout: 1500 });
