@@ -24,6 +24,7 @@
 
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { OpenAPIBackend } from 'openapi-backend';
@@ -141,18 +142,22 @@ const app = express();
 // layer so req.ip reflects the real client for rate limiting and logging.
 app.set('trust proxy', 1);
 
-// CORS configuration - permissive in dev, configurable allowlist in production
-const isProduction = process.env.NODE_ENV === 'production';
+// CORS configuration. Only localhost dev runs with a permissive "*" — any
+// deployed env (staging, production, test) must set ALLOWED_ORIGINS explicitly.
+// This fails closed: a misconfigured staging deploy rejects cross-origin
+// instead of silently opening up.
+const nodeEnv = process.env.NODE_ENV;
+const isLocalDev = nodeEnv === 'development' || nodeEnv === undefined || nodeEnv === '';
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
   : null;
 
 // Per-request debug logs are noisy on App Runner; opt in via DEBUG_REQUESTS=1.
-const debugRequests = !isProduction || process.env.DEBUG_REQUESTS === '1';
+const debugRequests = isLocalDev || process.env.DEBUG_REQUESTS === '1';
 const debugLog = (...args) => { if (debugRequests) console.log(...args); };
 
-if (isProduction && !allowedOrigins) {
-  console.warn('⚠️  NODE_ENV=production but ALLOWED_ORIGINS is unset — all cross-origin requests will be rejected.');
+if (!isLocalDev && !allowedOrigins) {
+  console.warn(`⚠️  NODE_ENV=${nodeEnv} but ALLOWED_ORIGINS is unset — all cross-origin requests will be rejected.`);
 }
 
 // Request ID + latency log middleware. Runs before everything else so even
@@ -177,14 +182,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Security headers. This is a JSON-only API (no HTML rendered, no inline
+// scripts), so helmet's defaults are safe. CSP is disabled because browsers
+// don't apply CSP to JSON responses anyway, and leaving it on would trip
+// tooling that proxies the spec through Swagger UI.
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
 app.use(compression());
 
-// CORS: in prod, check against allowlist and log rejections. In dev, allow all.
+// CORS: in local dev, allow all. In any deployed env, require an explicit
+// ALLOWED_ORIGINS allowlist — fails closed when unset.
 app.use(cors({
   origin: (origin, callback) => {
     // Same-origin or non-browser requests have no Origin header — always allow.
     if (!origin) return callback(null, true);
-    if (!isProduction) return callback(null, true);
+    if (isLocalDev) return callback(null, true);
     if (allowedOrigins && allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -316,15 +331,21 @@ let _cachedSegments = null;
 function getSegments() {
   if (_cachedSegments) return _cachedSegments;
   const configPath = path.join(dataDir, 'config.json');
-  if (fs.existsSync(configPath)) {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (config.segments) {
-      _cachedSegments = config.segments;
-      return _cachedSegments;
-    }
+  if (!fs.existsSync(configPath)) {
+    throw new Error(`getSegments: config.json not found at ${configPath}`);
   }
-  _cachedSegments = ['housing', 'transport', 'industry', 'services', 'datacenters'];
-  return _cachedSegments;
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  if (config.segment?.values) {
+    _cachedSegments = config.segment.values.map((s) => s.name);
+    return _cachedSegments;
+  }
+  if (Array.isArray(config.segments)) {
+    _cachedSegments = config.segments;
+    return _cachedSegments;
+  }
+  throw new Error(
+    'getSegments: config.json must define either `segment.values[].name` or a top-level `segments` array'
+  );
 }
 
 /* Query builders imported from ./query-builder.js */
