@@ -188,12 +188,18 @@ else
         "Compress": true
     },
     "CustomErrorResponses": {
-        "Quantity": 1,
+        "Quantity": 2,
         "Items": [
             {
+                "ErrorCode": 403,
+                "ResponsePagePath": "/404.html",
+                "ResponseCode": "404",
+                "ErrorCachingMinTTL": 300
+            },
+            {
                 "ErrorCode": 404,
-                "ResponsePagePath": "/index.html",
-                "ResponseCode": "200",
+                "ResponsePagePath": "/404.html",
+                "ResponseCode": "404",
                 "ErrorCachingMinTTL": 300
             }
         ]
@@ -396,22 +402,26 @@ echo "================================================"
 echo "Setup Complete!"
 echo "================================================"
 echo ""
-echo "GitHub Repository Secrets (Settings > Secrets > Actions):"
-echo "  AWS_ACCESS_KEY_ID     = <your-access-key>"
-echo "  AWS_SECRET_ACCESS_KEY = <your-secret-key>"
+echo "GitHub Repository Secrets (Settings > Secrets and variables > Actions > Secrets):"
 echo "  MAPBOX_TOKEN          = <your-mapbox-token>"
 echo ""
-echo "GitHub Environment Variables (Settings > Environments > ${ENVIRONMENT}):"
+echo "  (Note: no AWS access keys. The pipeline uses GitHub OIDC federation."
+echo "   See infrastructure/README.md for the one-time trust policy setup.)"
+echo ""
+echo "GitHub Environment Variables (Settings > Environments > ${ENVIRONMENT} > Variables):"
+echo "  AWS_DEPLOY_ROLE_ARN       = arn:aws:iam::${AWS_ACCOUNT_ID}:role/behovskartan-github-deploy"
 echo "  API_URL                   = https://${APP_RUNNER_URL:-<pending>}"
 echo "  APP_RUNNER_SERVICE_ARN    = ${APP_RUNNER_ARN}"
 echo "  S3_BUCKET_EXPLORER        = ${S3_BUCKET}"
+echo "  S3_DATA_BUCKET            = ${S3_DATA_BUCKET}"
 echo "  CLOUDFRONT_DISTRIBUTION_ID = ${CLOUDFRONT_ID}"
 echo "  CLOUDFRONT_DOMAIN         = ${CLOUDFRONT_DOMAIN}"
 echo "  ALLOWED_ORIGINS           = https://${CLOUDFRONT_DOMAIN}"
-echo "  S3_DATA_BUCKET            = ${S3_DATA_BUCKET}"
+echo "  MAPBOX_STYLE_LIGHT        = <your-mapbox-style-url>"
+echo "  DATA_VERSION              = <data-tag-or-date>"
 echo ""
 echo "Next steps:"
 echo "  1. Push initial Docker image (see commands above)"
-echo "  2. Configure GitHub secrets and environment variables"
-echo "  3. Push to main branch to trigger deployment"
+echo "  2. Configure the GitHub secret and environment variables listed above"
+echo "  3. Push to the 'production' branch (or 'staging') to trigger deployment"
 echo ""
