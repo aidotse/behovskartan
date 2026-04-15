@@ -267,27 +267,15 @@
         };
     }
 
-    onMount(() => {
-        // When fadeLeft is active, shift Sweden right so it renders
-        // in the visible (non-masked) portion of the container.
-        if (fadeLeft) {
-            fadeLeftPad = Math.round(mapContainer.clientWidth * 0.45);
-
-            resizeObserver = new ResizeObserver((entries) => {
-                const newPad = Math.round(entries[0].contentRect.width * 0.45);
-                if (newPad !== fadeLeftPad) {
-                    fadeLeftPad = newPad;
-                    if (map && mapLoaded && geography === 'total') {
-                        map.fitBounds(SWEDEN_BOUNDS, {
-                            ...FIT_BOUNDS_OPTIONS,
-                            padding: getFitPadding(),
-                            duration: 0
-                        });
-                    }
-                }
-            });
-            resizeObserver.observe(mapContainer);
-        }
+    // Kicks off the real mapbox-gl instance. Split out of onMount so we can
+    // defer it until the main thread is idle or the user interacts with the
+    // map container — `new mapboxgl.Map(...)` plus WebGL context setup costs
+    // ~2-3 seconds of pure JS on cold load, and we don't want that in front
+    // of the first-paint critical path. The `map-snapshot.png` placeholder
+    // stays visible until `mapReady` flips, so users see a styled Sweden
+    // snapshot the whole time and the real map fades in when ready.
+    function instantiateMap() {
+        if (map) return;
 
         map = new mapboxgl.Map({
             container: mapContainer,
@@ -408,8 +396,86 @@
 
             }
         });
+    }
+
+    onMount(() => {
+        // When fadeLeft is active, shift Sweden right so it renders
+        // in the visible (non-masked) portion of the container.
+        if (fadeLeft) {
+            fadeLeftPad = Math.round(mapContainer.clientWidth * 0.45);
+
+            resizeObserver = new ResizeObserver((entries) => {
+                const newPad = Math.round(entries[0].contentRect.width * 0.45);
+                if (newPad !== fadeLeftPad) {
+                    fadeLeftPad = newPad;
+                    if (map && mapLoaded && geography === 'total') {
+                        map.fitBounds(SWEDEN_BOUNDS, {
+                            ...FIT_BOUNDS_OPTIONS,
+                            padding: getFitPadding(),
+                            duration: 0
+                        });
+                    }
+                }
+            });
+            resizeObserver.observe(mapContainer);
+        }
+
+        // Lazy-boot triggers for `instantiateMap()`. Earliest of:
+        //   1. requestIdleCallback (or setTimeout fallback) after ~1.5s —
+        //      booting only once the container is currently visible, so the
+        //      persistent map stays dormant while the user is on /charts.
+        //   2. IntersectionObserver firing when the container scrolls/toggles
+        //      into view (e.g. nav from /charts → /).
+        //   3. pointerenter / pointerdown on the container — user hover/tap
+        //      kicks off boot immediately, no idle wait.
+        let idleHandle: number | null = null;
+        let idleTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
+        let io: IntersectionObserver | null = null;
+
+        const tryBoot = () => {
+            if (map) { cleanupTriggers(); return; }
+            // offsetParent === null means the element (or an ancestor) has
+            // display:none — don't pay the boot cost while the persistent
+            // desktop map is hidden behind /charts.
+            if (mapContainer.offsetParent === null) return;
+            instantiateMap();
+            cleanupTriggers();
+        };
+
+        const onPointer = () => { instantiateMap(); cleanupTriggers(); };
+
+        const cleanupTriggers = () => {
+            if (idleHandle != null && 'cancelIdleCallback' in window) {
+                (window as any).cancelIdleCallback(idleHandle);
+            }
+            idleHandle = null;
+            if (idleTimeoutHandle != null) clearTimeout(idleTimeoutHandle);
+            idleTimeoutHandle = null;
+            io?.disconnect();
+            io = null;
+            mapContainer.removeEventListener('pointerenter', onPointer);
+            mapContainer.removeEventListener('pointerdown', onPointer);
+        };
+
+        mapContainer.addEventListener('pointerenter', onPointer, { once: true });
+        mapContainer.addEventListener('pointerdown', onPointer, { once: true });
+
+        if ('IntersectionObserver' in window) {
+            io = new IntersectionObserver((entries) => {
+                if (entries.some((e) => e.isIntersecting)) tryBoot();
+            }, { threshold: 0.1 });
+            io.observe(mapContainer);
+        }
+
+        if ('requestIdleCallback' in window) {
+            idleHandle = (window as any).requestIdleCallback(() => tryBoot(), { timeout: 1500 });
+        } else {
+            idleTimeoutHandle = setTimeout(tryBoot, 800);
+        }
+
+        return cleanupTriggers;
     });
-    
+
     $effect(() => {
         if (mapLoaded && mergedData) {
             const source = map?.getSource('counties') as mapboxgl.GeoJSONSource;
