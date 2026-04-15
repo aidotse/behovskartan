@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"login": "aws sso login --profile AWSAdministratorAccess-600627346413",
+		"login": "aws sso login --profile ${AWS_SSO_PROFILE:-behovskartan-admin}",
 		"dev": "vite dev --host",
 		"dev:api": "vite dev --mode production",
 		"build": "vite build",
@@ -33,7 +33,7 @@
 		"@storybook/sveltekit": "^9.1.13",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-static": "^3.0.8",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/kit": "^2.57.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/container-queries": "^0.1.1",
