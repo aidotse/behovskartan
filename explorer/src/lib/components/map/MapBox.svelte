@@ -280,10 +280,13 @@
         map = new mapboxgl.Map({
             container: mapContainer,
             accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
-            style: MAPBOX_STYLE,
+            style: MAPBOX_STYLE + '?optimize=true',
             bounds: SWEDEN_BOUNDS,
             fitBoundsOptions: { ...FIT_BOUNDS_OPTIONS, padding: getFitPadding() },
-            attributionControl: false // Hide Mapbox logo and info button
+            attributionControl: false,
+            renderWorldCopies: false,
+            fadeDuration: 0,
+            localFontFamily: 'system-ui, sans-serif'
         });
 
         popup = new mapboxgl.Popup({

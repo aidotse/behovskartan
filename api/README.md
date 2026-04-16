@@ -140,7 +140,6 @@ This API uses TypeDoc to generate comprehensive documentation from JSDoc comment
 The API follows a modular architecture with:
 
 - **Core Utilities** (`utils.js`) - Date parsing and period handling
-- **Configuration** (`config.js`) - Environment-specific settings
 - **Endpoint Generators** (`scripts/endpoints/`) - Static data generation
 - **OpenAPI Specification** (`openapi.yaml`) - API contract definition
 - **Local Server** (`local-server.js`) - Express + OpenAPI Backend + DuckDB

@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>{$page.status === 404 ? 'Sidan finns inte' : 'Något gick fel'} — Behovskartan</title>
+	<title>{$page.status === 404 ? 'Sidan finns inte' : 'Något gick fel'} | Behovskartan</title>
 </svelte:head>
 
 <PageContainer>

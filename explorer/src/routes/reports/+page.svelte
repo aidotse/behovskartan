@@ -30,7 +30,7 @@
 				</h2>
 			</div>
 			<p class="text-sm text-gray-600 leading-relaxed">
-				Analys av effektbehov — när toppar efterfrågan, hur stor är variationen
+				Analys av effektbehov: när toppar efterfrågan, hur stor är variationen
 				över dygnet och året, och vad driver effekttopparna?
 			</p>
 		</a>

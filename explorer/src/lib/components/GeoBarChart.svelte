@@ -335,7 +335,7 @@
 </script>
 
 <ChartContainer
-	title="Årlig energiförbrukning per geografi"
+	title="Årlig elanvändning per geografi"
 	{description}
 	sizeVariant="none"
 	aspectRatio="auto"

@@ -115,7 +115,7 @@
 </script>
 
 <svelte:head>
-	<title>Data & API — Behovskartan</title>
+	<title>Data & API | Behovskartan</title>
 	<meta name="description" content="Dokumentation för Behovskartans öppna API på api.behovskartan.se" />
 </svelte:head>
 
@@ -155,9 +155,9 @@
 	<section class="mb-10 p-5 bg-gray-50 rounded-lg">
 		<h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Snabbstart</h2>
 		<ol class="list-decimal list-inside text-sm text-gray-700 space-y-1 mb-4">
-			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /parameters</code> — Hämta tillgängliga parametervärden</li>
-			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /scenarios</code> — Hämta tillgängliga scenarier</li>
-			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /demand</code> — Hämta tidsserier med valfria filter</li>
+			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /parameters</code>: Hämta tillgängliga parametervärden</li>
+			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /scenarios</code>: Hämta tillgängliga scenarier</li>
+			<li><code class="text-xs bg-white px-1.5 py-0.5 rounded border">GET /demand</code>: Hämta tidsserier med valfria filter</li>
 		</ol>
 		<p class="text-xs text-gray-500">
 			Svarsformat: JSON (standard) eller CSV (<code class="bg-white px-1 py-0.5 rounded border">?format=csv</code>).
@@ -212,7 +212,7 @@
 									{#each block.inline as tok}{#if tok.kind === 'bold'}<strong>{tok.value}</strong>{:else if tok.kind === 'code'}<code class="text-[11px] bg-white px-1 py-0.5 rounded border border-gray-200">{tok.value}</code>{:else}{tok.value}{/if}{/each}
 								</p>
 							{:else if block.kind === 'bullet'}
-								<span class="block pl-4">— {#each block.inline as tok}{#if tok.kind === 'bold'}<strong>{tok.value}</strong>{:else if tok.kind === 'code'}<code class="text-[11px] bg-white px-1 py-0.5 rounded border border-gray-200">{tok.value}</code>{:else}{tok.value}{/if}{/each}</span>
+								<span class="block pl-4">· {#each block.inline as tok}{#if tok.kind === 'bold'}<strong>{tok.value}</strong>{:else if tok.kind === 'code'}<code class="text-[11px] bg-white px-1 py-0.5 rounded border border-gray-200">{tok.value}</code>{:else}{tok.value}{/if}{/each}</span>
 							{:else}
 								<span class="block">{#each block.inline as tok}{#if tok.kind === 'bold'}<strong>{tok.value}</strong>{:else if tok.kind === 'code'}<code class="text-[11px] bg-white px-1 py-0.5 rounded border border-gray-200">{tok.value}</code>{:else}{tok.value}{/if}{/each}</span>
 							{/if}
@@ -319,7 +319,7 @@
 	</section>
 
 	<footer class="mt-8 pt-6 border-t border-gray-100 text-xs text-gray-400 flex justify-between">
-		<p>Genererad från <a href="/openapi.json" class="underline hover:text-gray-600">openapi.json</a> — OpenAPI {spec.openapi}</p>
+		<p>Genererad från <a href="/openapi.json" class="underline hover:text-gray-600">openapi.json</a> · OpenAPI {spec.openapi}</p>
 		<a href="https://github.com/aidotse/behovskartan" class="underline hover:text-gray-600">GitHub</a>
 	</footer>
 	</div>

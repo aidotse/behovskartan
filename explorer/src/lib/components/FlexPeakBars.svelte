@@ -47,7 +47,7 @@
 		class?: string;
 	} = $props();
 
-	const baseScenario = $derived(baseScenarioOverride || parameterStore.baseScenario);
+	const baseScenario = $derived(parameterStore.defaultScenario?.id || 'current-policy');
 	const parameterValues = $derived(parameterValuesOverride || parameterStore.parameterValues);
 
 	let loading = $state(true);
@@ -58,15 +58,31 @@
 	const delta = $derived(baselinePeak - flexPeak);
 	const pct = $derived(baselinePeak > 0 ? (delta / baselinePeak) * 100 : 0);
 
-	function buildFlexParams(base: Record<string, number>, flexIndex: number): Record<string, number> {
+	function buildBaselineParams(base: Record<string, number>): Record<string, number> {
 		const result = { ...base };
-		if (segment === 'total') {
-			for (const fp of FLEX_PARAMS) { result[fp] = flexIndex; }
-		} else if (SEGMENT_TO_FLEX[segment]) {
-			result[SEGMENT_TO_FLEX[segment]] = flexIndex;
-		}
+		for (const fp of FLEX_PARAMS) { result[fp] = 0; }
 		return result;
 	}
+
+	function buildFlexParams(base: Record<string, number>): Record<string, number> {
+		const result = { ...base };
+		const relevant = segment === 'total'
+			? [...FLEX_PARAMS]
+			: SEGMENT_TO_FLEX[segment] ? [SEGMENT_TO_FLEX[segment]] : [];
+		const hasAnyFlex = relevant.some(fp => (base[fp] || 0) > 0);
+		if (hasAnyFlex) return result;
+		for (const fp of relevant) { result[fp] = 2; }
+		return result;
+	}
+
+	const flexLabel = $derived.by(() => {
+		const relevant = segment === 'total'
+			? [...FLEX_PARAMS]
+			: SEGMENT_TO_FLEX[segment] ? [SEGMENT_TO_FLEX[segment]] : [];
+		const hasAnyFlex = relevant.some(fp => (parameterValues[fp] || 0) > 0);
+		if (!hasAnyFlex) return 'Med flex (standard)';
+		return 'Med flex';
+	});
 
 	async function fetchPeakData() {
 		if (!geography || !year || !baseScenario) return;
@@ -77,8 +93,8 @@
 			const end = `${year + 1}-01-01`;
 			const seg = segment || 'total';
 
-			const baselineParams = buildFlexParams(parameterValues, 0);
-			const flexParams = buildFlexParams(parameterValues, 2);
+			const baselineParams = buildBaselineParams(parameterValues);
+			const flexParams = buildFlexParams(parameterValues);
 
 			const [baselineData, flexData] = await Promise.all([
 				fetchDemandData(makeDemandQuery({ start, end, resolution: '1h', aggregation: 'sum', geography, segment: seg, baseScenario, parameterValues: baselineParams })),
@@ -241,7 +257,7 @@
 				x={barRightX + BAR_W / 2} y={TOP + BAR_AREA_H + 38}
 				text-anchor="middle" font-size="10" fill={viz.mutedLabel}
 			>
-				Med 15 % flexibilitet
+				{flexLabel}
 			</text>
 		</svg>
 	{/if}

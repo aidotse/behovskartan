@@ -133,13 +133,13 @@
 	};
 
 	const CHART_TITLES: Record<string, string> = {
-		[CHART_IDS.AREA_CHART]: 'Årlig energiförbrukning',
+		[CHART_IDS.AREA_CHART]: 'Årlig elanvändning',
 		[CHART_IDS.TIMELINE]: 'Tidslinje',
 		[CHART_IDS.HISTOGRAM]: 'Histogram över effektbehovet',
 		[CHART_IDS.SEGMENT_ARC]: 'Energi per sektor',
 		[CHART_IDS.SECTOR_PIE]: 'Sektoruppdelning',
 		[CHART_IDS.PERIOD_HEATMAP]: 'Effektbehov per månad och tid på dygnet',
-		[CHART_IDS.GEO_BAR]: 'Energiförbrukning per geografi',
+		[CHART_IDS.GEO_BAR]: 'Elanvändning per geografi',
 		[CHART_IDS.GEO_SEGMENT]: 'Sektorernas andel per län',
 		[CHART_IDS.STACKED_SECTOR]: 'Sektorer över tid',
 		[CHART_IDS.WEEKLY_PROFILE]: 'Veckobelastning per månad',
@@ -181,10 +181,11 @@
 		const params = getEffectiveParams(chartId);
 		const geo = getGeoLabel(params.geography || 'total', geographiesMeta);
 		const seg = getSegmentSuffix(getActiveSegment(chartId));
+		const effectiveParamValues = params.parameterValues ?? parameterStore.parameterValues;
 		const suffix = buildScenarioSuffix(
 			params.scenarioId || parameterStore.baseScenario,
 			parameterStore.baseScenarios,
-			parameterStore.parameterValues,
+			effectiveParamValues,
 			parameterStore.getParameter.bind(parameterStore)
 		);
 		return CHART_DESCRIPTIONS[chartId]?.(params.year || 2050, geo, seg, suffix) || '';
@@ -268,7 +269,7 @@
 </script>
 
 <svelte:head>
-	<title>Grafer — Behovskartan</title>
+	<title>Grafer | Behovskartan</title>
 </svelte:head>
 
 <!-- Custom layout — sidebar positioned outside the content card flow -->
@@ -697,6 +698,8 @@
 						{availableParameters}
 						geographiesMetadata={geographiesMeta}
 						allChartIds={ALL_CHART_IDS}
+						hideScenario={activeFilterChart === CHART_IDS.FLEX_IMPACT || activeFilterChart === CHART_IDS.FLEX_PEAK_BARS}
+						scenarioNote="Flex visas för scenariot Beslutad politik."
 						onClose={() => activeFilterChart = null}
 						onApplyToAll={handleApplyToAll}
 					/>
@@ -757,6 +760,8 @@
 				{availableParameters}
 				geographiesMetadata={geographiesMeta}
 				allChartIds={ALL_CHART_IDS}
+				hideScenario={activeFilterChart === CHART_IDS.FLEX_IMPACT || activeFilterChart === CHART_IDS.FLEX_PEAK_BARS}
+				scenarioNote="Flex visas för scenariot Beslutad politik."
 				onClose={() => activeFilterChart = null}
 				onApplyToAll={handleApplyToAll}
 			/>

@@ -24,6 +24,8 @@
 		availableParameters,
 		geographiesMetadata = [],
 		allChartIds = [],
+		hideScenario = false,
+		scenarioNote = '',
 		onClose,
 		onApplyToAll
 	}: {
@@ -33,6 +35,8 @@
 		availableParameters: AvailableParameters;
 		geographiesMetadata?: Array<{ id: string; name: string; type?: string }>;
 		allChartIds?: string[];
+		hideScenario?: boolean;
+		scenarioNote?: string;
 		onClose: () => void;
 		onApplyToAll?: () => void;
 	} = $props();
@@ -188,30 +192,36 @@
 
 	<!-- Scenario (per-chart, writes to chartParametersStore) -->
 	{#if parameterStore.isInitialized}
-		<div>
-			<span class="block text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-				Scenario
-			</span>
-			<div class="flex flex-col gap-1">
-				{#each parameterStore.baseScenarios as scenario}
-					<button
-						onclick={() => handleBaseScenarioChange(scenario.id)}
-						class="w-full px-3 py-1.5 text-left text-xs rounded-md transition-colors
-							{effectiveScenarioId === scenario.id
-							? 'bg-chart-100 text-chart-900 font-medium'
-							: 'bg-gray-50 text-gray-700 hover:bg-gray-100'}"
-					>
-						{scenario.name}
-						{#if scenario.default}
-							<span class="text-[10px] text-gray-400 ml-1">(Standard)</span>
-						{/if}
-					</button>
-				{/each}
+		{#if !hideScenario}
+			<div>
+				<span class="block text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+					Scenario
+				</span>
+				<div class="flex flex-col gap-1">
+					{#each parameterStore.baseScenarios as scenario}
+						<button
+							onclick={() => handleBaseScenarioChange(scenario.id)}
+							class="w-full px-3 py-1.5 text-left text-xs rounded-md transition-colors
+								{effectiveScenarioId === scenario.id
+								? 'bg-chart-100 text-chart-900 font-medium'
+								: 'bg-gray-50 text-gray-700 hover:bg-gray-100'}"
+						>
+							{scenario.name}
+							{#if scenario.default}
+								<span class="text-[10px] text-gray-400 ml-1">(Standard)</span>
+							{/if}
+						</button>
+					{/each}
+				</div>
 			</div>
-		</div>
+		{:else if scenarioNote}
+			<div class="p-2 bg-gray-50 rounded-md">
+				<p class="text-[10px] text-gray-500">{scenarioNote}</p>
+			</div>
+		{/if}
 
-		<!-- Parameter sliders (only for default scenario) -->
-		{#if isDefaultScenario}
+		<!-- Parameter sliders (only for default scenario, or always when scenario is locked) -->
+		{#if isDefaultScenario || hideScenario}
 			<div>
 				<div class="flex items-center justify-between mb-1.5">
 					<span class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">

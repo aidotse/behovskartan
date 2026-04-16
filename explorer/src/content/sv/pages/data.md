@@ -13,18 +13,11 @@ API:et är byggt med OpenAPI 3.1 och använder DuckDB för snabba frågor mot
 strukturerade Parquet-filer. All data är tillgänglig med olika tidsupplösningar
 och kan filtreras på geografi, segment och scenario.
 
-## API-dokumentation
-
-Fullständig, interaktiv API-dokumentation finns tillgänglig med alla endpoints,
-parametrar, svarsformat och exempel:
-
-**[Öppna API-dokumentation →](/api-docs)**
-
 ## Snabbstart
 
-1. **`GET /parameters`** — Hämta tillgängliga parametervärden (år, geografier, segment, upplösningar)
-2. **`GET /scenarios`** — Hämta tillgängliga scenarier
-3. **`GET /demand`** — Hämta tidsserier med valfria filter
+1. **`GET /parameters`**: Hämta tillgängliga parametervärden (år, geografier, segment, upplösningar)
+2. **`GET /scenarios`**: Hämta tillgängliga scenarier
+3. **`GET /demand`**: Hämta tidsserier med valfria filter
 
 ### Exempelfråga
 

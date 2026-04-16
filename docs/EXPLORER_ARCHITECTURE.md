@@ -73,8 +73,7 @@ Explorer is a **modular visual framework** for communicating energy forecast dat
 ├── contentLoader.ts           # Markdown content system
 ├── utilities.ts               # Helper functions
 │   ├── makeDemandQuery()      # Construct API queries
-│   ├── formatNumber()         # Number formatting
-│   └── getGeos()              # Geography filtering
+│   └── formatNumber()         # Number formatting
 └── types/
     └── api.ts                 # TypeScript types for API responses
 ```

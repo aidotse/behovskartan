@@ -43,7 +43,7 @@
 </script>
 
 <div class="prose prose-sm max-w-none">
-	<h2>Elbehovet växer — men inte överallt på samma sätt</h2>
+	<h2>Elbehovet växer, men inte överallt på samma sätt</h2>
 
 	<p>
 		Sverige använder idag runt 140 TWh el per år. I det valda scenariot

@@ -11,6 +11,6 @@
 			target="_blank"
 			rel="noopener noreferrer"
 			class="underline hover:text-teal-700">MIT-licensen</a
-		> — fri att använda, modifiera och distribuera med angivande av upphovsperson.
+		>: fri att använda, modifiera och distribuera med angivande av upphovsperson.
 	</p>
 </footer>

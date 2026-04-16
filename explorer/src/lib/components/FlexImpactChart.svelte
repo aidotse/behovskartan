@@ -1,9 +1,9 @@
 <script lang="ts">
 	/**
-	 * FlexImpactChart — Power duration curve comparing baseline vs 15% flex
+	 * FlexImpactChart — Power duration curve comparing baseline vs flex
 	 *
 	 * Uses the multi-series AreaChart pattern from AreaChart.svelte lines 372-420.
-	 * Compares baseline (no flex) vs 15% flex as two overlaid duration curves.
+	 * Compares baseline (no flex) vs user-selected flex level as two overlaid duration curves.
 	 *
 	 * @component
 	 */
@@ -51,7 +51,7 @@
 		class?: string;
 	} = $props();
 
-	const baseScenario = $derived(baseScenarioOverride || parameterStore.baseScenario);
+	const baseScenario = $derived(parameterStore.defaultScenario?.id || 'current-policy');
 	const parameterValues = $derived(parameterValuesOverride || parameterStore.parameterValues);
 
 	let loading = $state(true);
@@ -61,15 +61,31 @@
 	let flexPeak = $state(0);
 	let peakReduction = $state(0);
 
-	function buildFlexParams(base: Record<string, number>, flexIndex: number): Record<string, number> {
+	function buildBaselineParams(base: Record<string, number>): Record<string, number> {
 		const result = { ...base };
-		if (segment === 'total') {
-			for (const fp of FLEX_PARAMS) { result[fp] = flexIndex; }
-		} else if (SEGMENT_TO_FLEX[segment]) {
-			result[SEGMENT_TO_FLEX[segment]] = flexIndex;
-		}
+		for (const fp of FLEX_PARAMS) { result[fp] = 0; }
 		return result;
 	}
+
+	function buildFlexParams(base: Record<string, number>): Record<string, number> {
+		const result = { ...base };
+		const relevant = segment === 'total'
+			? [...FLEX_PARAMS]
+			: SEGMENT_TO_FLEX[segment] ? [SEGMENT_TO_FLEX[segment]] : [];
+		const hasAnyFlex = relevant.some(fp => (base[fp] || 0) > 0);
+		if (hasAnyFlex) return result;
+		for (const fp of relevant) { result[fp] = 2; }
+		return result;
+	}
+
+	const flexLabel = $derived.by(() => {
+		const relevant = segment === 'total'
+			? [...FLEX_PARAMS]
+			: SEGMENT_TO_FLEX[segment] ? [SEGMENT_TO_FLEX[segment]] : [];
+		const hasAnyFlex = relevant.some(fp => (parameterValues[fp] || 0) > 0);
+		if (!hasAnyFlex) return 'Med flex (standard)';
+		return 'Med flex';
+	});
 
 	async function fetchFlexData() {
 		if (!geography || !year || !baseScenario) return;
@@ -80,8 +96,8 @@
 			const end = `${year + 1}-01-01`;
 			const seg = segment || 'total';
 
-			const baselineParams = buildFlexParams(parameterValues, 0);
-			const flexParams = buildFlexParams(parameterValues, 2);
+			const baselineParams = buildBaselineParams(parameterValues);
+			const flexParams = buildFlexParams(parameterValues);
 
 			const [baselineData, flexData] = await Promise.all([
 				fetchDemandData(makeDemandQuery({ start, end, resolution: '1h', aggregation: 'sum', geography, segment: seg, baseScenario, parameterValues: baselineParams })),
@@ -149,10 +165,10 @@
 		}
 	];
 
-	const SERIES_LABELS: Record<string, string> = {
+	const SERIES_LABELS = $derived({
 		baseline: 'Utan flex',
-		flex: 'Med 15% flex'
-	};
+		flex: flexLabel
+	});
 	const SERIES_COLORS: Record<string, string> = {
 		baseline: BASELINE_COLOR,
 		flex: FLEX_COLOR
@@ -188,10 +204,17 @@
 			grid={false}
 			props={{
 				xAxis: {
-					format: (v: number) => `${v.toLocaleString('sv-SE')} h`,
+					format: (v: number) => {
+						if (v === 0) return 'Högst';
+						if (v >= 8000) return 'Lägst';
+						return `${v.toLocaleString('sv-SE')}`;
+					},
 					tickLabelProps: { fontSize: 11 }
 				},
-				yAxis: { tickLabelProps: { fontSize: 11 } },
+				yAxis: {
+					format: (v: number) => formatNumber(v, getPowerPrefix(), 'W').replace(/\.\d+/, ''),
+					tickLabelProps: { fontSize: 11 }
+				},
 				highlight: {
 					lines: { class: 'stroke-black [stroke-width:1.5px] [stroke-dasharray:6_4]' },
 					axis: 'both',
@@ -209,7 +232,7 @@
 					contained={false}
 					let:data
 				>
-					{x(data).toLocaleString('sv-SE')} h
+					Timme {x(data).toLocaleString('sv-SE')} av 8 760
 				</Tooltip.Root>
 				<Tooltip.Root
 					x={padding.left}
@@ -228,14 +251,15 @@
 	</div>
 
 	{#if !loading && !error && durationData.length > 0}
-		<div class="flex flex-wrap justify-center gap-x-5 gap-y-1 mt-3 px-1 text-xs text-gray-600">
+		<p class="text-center text-[10px] text-gray-400 mt-1">← Timmar rankade från högst till lägst effektbehov →</p>
+		<div class="flex flex-wrap justify-center gap-x-5 gap-y-1 mt-2 px-1 text-xs text-gray-600">
 			<div class="flex items-center gap-1.5">
 				<span class="w-3 h-0.5 rounded" style="background: {BASELINE_COLOR}"></span>
 				Utan flex: <span class="font-semibold text-gray-900">{formatNumber(baselinePeak, getPowerPrefix(), 'W')}</span>
 			</div>
 			<div class="flex items-center gap-1.5">
 				<span class="w-3 h-0.5 rounded" style="background: {FLEX_COLOR}"></span>
-				Med 15% flex: <span class="font-semibold text-gray-900">{formatNumber(flexPeak, getPowerPrefix(), 'W')}</span>
+				{flexLabel}: <span class="font-semibold text-gray-900">{formatNumber(flexPeak, getPowerPrefix(), 'W')}</span>
 			</div>
 			<div>
 				Minskning: <span class="font-semibold text-red-700">-{peakReduction.toFixed(1)}%</span>

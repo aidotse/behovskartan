@@ -110,7 +110,7 @@ When asked to "clean up the codebase" or after completing major features:
   - `test_db.py` - Parquet scaffold read/write, DuckDB operations
   - Run with: `conda run -n energy-toolkit python -m pytest generator/tests/ -v`
 - **Explorer Tests**: `/explorer/src/lib/`
-  - `utilities.test.ts` - formatNumber, getGeos, makeDemandQuery
+  - `utilities.test.ts` - formatNumber, makeDemandQuery
   - `comparisonUtils.test.ts` - Scenario comparison, color assignment, data merging
   - `stores/parameterStore.test.ts` - Parameter store state management
   - Component tests co-located with components (e.g., `AreaChart.test.ts`)

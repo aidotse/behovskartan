@@ -45,8 +45,8 @@ describe('AreaChart', () => {
 			}
 		});
 
-		// Title should show "Årlig energi" for sum aggregation
-		const titles = screen.getAllByText(/Årlig energi/i);
+		// Title should show "Årlig elenergi" for sum aggregation
+		const titles = screen.getAllByText(/Årlig elenergi/i);
 		expect(titles.length).toBeGreaterThan(0);
 	});
 

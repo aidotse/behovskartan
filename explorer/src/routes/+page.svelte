@@ -94,7 +94,7 @@
 </script>
 
 <svelte:head>
-	<title>Sveriges framtida elbehov — Behovskartan</title>
+	<title>Sveriges framtida elbehov | Behovskartan</title>
 	<meta name="description" content="Utforska scenarier för Sveriges framtida elanvändning uppdelat på regioner, sektorer och tid." />
 </svelte:head>
 

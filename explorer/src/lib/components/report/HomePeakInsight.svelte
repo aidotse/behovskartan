@@ -1,17 +1,13 @@
 <script lang="ts">
-	/**
-	 * HomePeakInsight - Dynamic InsightBox about peak power for the home page.
-	 *
-	 * Fetches hourly peak power data for 2025 and the target year,
-	 * calculates % change, and renders an InsightBox with the result.
-	 */
 	import { viewStore } from '$lib/stores/viewStore.svelte';
 	import { parameterStore } from '$lib/stores/parameterStore.svelte';
 	import { fetchDemandData } from '$lib/dataService';
 	import { makeDemandQuery } from '$lib/utilities';
 	import InsightBox from '$lib/components/report/InsightBox.svelte';
 
-	let peakChangePercent = $state(0);
+	let peakGW = $state(0);
+	let valleyGW = $state(0);
+	let ratio = $state(0);
 
 	const targetYear = $derived(viewStore.year);
 
@@ -24,17 +20,7 @@
 			? parameterStore.parameterValues
 			: undefined;
 
-		const query2025 = makeDemandQuery({
-			start: '2025-01-01',
-			end: '2026-01-01',
-			resolution: '1h',
-			aggregation: 'sum',
-			geography: 'total',
-			segment: 'total',
-			baseScenario: baseScenario,
-			parameterValues: paramValues
-		});
-		const queryTarget = makeDemandQuery({
+		const query = makeDemandQuery({
 			start: `${currentYear}-01-01`,
 			end: `${currentYear + 1}-01-01`,
 			resolution: '1h',
@@ -45,21 +31,25 @@
 			parameterValues: paramValues
 		});
 
-		Promise.all([fetchDemandData(query2025), fetchDemandData(queryTarget)]).then(
-			([data2025, dataTarget]) => {
-				const peak2025 = data2025.reduce((max, d) => Math.max(max, d.value || 0), 0);
-				const peakTarget = dataTarget.reduce((max, d) => Math.max(max, d.value || 0), 0);
-				peakChangePercent = peak2025 > 0
-					? Math.round(((peakTarget - peak2025) / peak2025) * 100)
-					: 0;
+		fetchDemandData(query).then((data) => {
+			if (!data.length) return;
+			let max = 0;
+			let min = Infinity;
+			for (const d of data) {
+				const v = d.value || 0;
+				if (v > max) max = v;
+				if (v > 0 && v < min) min = v;
 			}
-		);
+			peakGW = Math.round(max);
+			valleyGW = Math.round(min);
+			ratio = min > 0 ? Math.round(max / min) : 0;
+		});
 	});
 </script>
 
-<InsightBox title="Toppeffekten är den verkliga utmaningen">
-	Skillnaden mellan energi (TWh per år) och effekt (GW just nu) är
-	avgörande. Årsstatistiken kan se hanterbar ut — men en kall vintermorgon
-	{targetYear} kan effektbehovet vara {peakChangePercent}
-	procent högre än idag. Det är de timmarna som avgör om elnätet klarar sig.
+<InsightBox title="Effektbehovet varierar enormt inom ett år">
+	En kall vintermorgon {targetYear} kan Sveriges samlade effektbehov nå runt
+	{peakGW} GW. En mild sommarnatt samma år kan det ligga under
+	{valleyGW} GW. Det innebär att elnätet måste klara ungefär {ratio} gånger
+	så hög belastning som vid årets lugnaste timmar.
 </InsightBox>

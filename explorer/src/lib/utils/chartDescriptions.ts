@@ -92,14 +92,14 @@ export const CHART_DESCRIPTIONS: Record<
 		`Visar genomsnittlig effekt (GW) per månad och tid på dygnet för ${g}${seg} år ${y} ${s}`,
 	timeline: (y, g, seg, s) => `Elbehov över tid för ${g}${seg} år ${y} ${s}`,
 	histogram: (y, g, seg, s) =>
-		`Visar hur många timmar per år som effektbehovet ligger på en given nivå för ${g}${seg} år ${y} — illustrerar hur ofta efterfrågan är hög respektive låg. ${s}`,
+		`Visar hur många timmar per år som effektbehovet ligger på en given nivå för ${g}${seg} år ${y}. Illustrerar hur ofta efterfrågan är hög respektive låg. ${s}`,
 	'stacked-sector': (y, g, seg, s) => `Elbehov per sektor över tid för ${g} 2025–2050 ${s}`,
 	'weekly-profile': (y, g, seg, s) =>
 		`Genomsnittlig veckobelastning per månad för ${g}${seg} år ${y} ${s}`,
 	map: (y, g, seg, s) => `Geografisk fördelning av elbehov år ${y} ${s}`,
 	'flex-impact': (y, g, seg, s) =>
-		`Varaktighetskurva som jämför effektbehovet med och utan 15% flexibilitet för ${g}${seg} år ${y} ${s}`,
+		`Årets 8 760 timmar rankade från högst till lägst effektbehov för ${g}${seg} år ${y}. Visar hur flex sänker topparna (vänster) och höjer dalarna (höger) utan att ändra den totala energin. ${s}`,
 	'flex-peak-bars': (y, g, seg, s) =>
-		`Toppeffekt med och utan 15% flexibilitet för ${g}${seg} år ${y} ${s}`,
+		`Toppeffekt med och utan flexibilitet för ${g}${seg} år ${y} ${s}`,
 	'geo-pie': (y, g, seg, s) => `Topp 4 län efter elbehov${seg} år ${y} ${s}`
 };

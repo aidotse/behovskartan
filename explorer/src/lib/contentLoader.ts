@@ -181,43 +181,6 @@ export function loadLocalizedContentSync(slug: string): ContentFile | null {
 }
 
 /**
- * Load all content files for a given locale
- *
- * @param locale - Language locale (sv or en)
- * @returns Promise resolving to array of content files with their slugs
- */
-export async function loadAllContent(
-	locale: Locale
-): Promise<Array<{ slug: string; content: ContentFile }>> {
-	const prefix = `../content/${locale}/`;
-	const results: Array<{ slug: string; content: ContentFile }> = [];
-
-	for (const [path, module] of Object.entries(contentModules)) {
-		if (!path.startsWith(prefix)) continue;
-
-		// Extract slug: remove prefix and extension
-		const slug = path.slice(prefix.length).replace(/\.(svx|md)$/, '');
-		const metadata = extractMetadata(module);
-		results.push({
-			slug,
-			content: { default: module.default, metadata }
-		});
-	}
-
-	return results;
-}
-
-/**
- * Preload content files for faster access
- *
- * @param locale - Language locale
- * @param slugs - Array of content slugs to preload
- */
-export async function preloadContent(locale: Locale, slugs: string[]): Promise<void> {
-	await Promise.all(slugs.map((slug) => loadContent(locale, slug)));
-}
-
-/**
  * Clear the content cache
  */
 export function clearContentCache(): void {

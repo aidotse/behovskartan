@@ -3,8 +3,6 @@
 import pytest
 import pandas as pd
 import numpy as np
-from pathlib import Path
-
 from generator.library.curves import (
     generate_constant,
     generate_linear,

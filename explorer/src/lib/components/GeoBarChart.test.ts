@@ -51,7 +51,7 @@ describe('GeoBarChart', () => {
 			}
 		});
 
-		const titles = screen.getAllByText(/Årlig energiförbrukning per geografi/i);
+		const titles = screen.getAllByText(/Årlig elanvändning per geografi/i);
 		expect(titles.length).toBeGreaterThan(0);
 	});
 

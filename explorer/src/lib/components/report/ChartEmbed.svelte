@@ -94,8 +94,8 @@
 		'sector-pie': (y, g, seg, s) => `Sektorsfördelning av elbehov för ${g} år ${y} ${s}`,
 		'geo-segment': (y, g, seg, s) => `Sektorernas andel av elbehovet per län år ${y} ${s}`,
 		'period-heatmap': (y, g, seg, s) => `Elbehov fördelat på månad och tid på dygnet för ${g}${seg} år ${y} ${s}`,
-		'flex-impact': (y, g, seg, s) => `Varaktighetskurva som jämför effektbehovet med och utan 15% flexibilitet för ${g}${seg} år ${y} ${s}`,
-		'flex-peak-bars': (y, g, seg, s) => `Toppeffekt med och utan 15% flexibilitet för ${g}${seg} år ${y} ${s}`
+		'flex-impact': (y, g, seg, s) => `Årets 8 760 timmar rankade från högst till lägst effektbehov för ${g}${seg} år ${y}. Visar hur flex sänker topparna (vänster) och höjer dalarna (höger) utan att ändra den totala energin. ${s}`,
+		'flex-peak-bars': (y, g, seg, s) => `Toppeffekt med och utan flexibilitet för ${g}${seg} år ${y} ${s}`
 	};
 
 	let description = $derived(DESCRIPTIONS[chart]?.(viewStore.year, geoLabel, segmentLabel, scenarioSuffix) ?? '');

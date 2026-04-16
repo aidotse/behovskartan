@@ -67,23 +67,6 @@ export function handleAnchorClick(event: Event) {
 	}
 }
 
-export function getGeos(geographies: any[]) {
-	return geographies
-		.map((geo) => ({
-			label: geo.geo_name, // The text displayed in the dropdown
-			value: geo.geo_id // The value associated with the option
-		}))
-		.filter((geo) => geo.label && geo.value) // Filter out invalid entries
-		.sort((a, b) => {
-			// Sort alphabetically by label but put 'Sverige' first
-			return a.label === 'Sverige'
-				? -1
-				: b.label === 'Sverige'
-					? 1
-					: (a.label || '').localeCompare(b.label || '', 'sv'); // Sort alphabetically for others
-		});
-}
-
 /**
  * Parameter values type for Strategy 2
  */
@@ -153,34 +136,6 @@ export const makeDemandQuery = (opts: {
 	qp.set('format', 'json');
 
 	return qp;
-};
-
-/**
- * Build query parameters for configuration endpoint
- */
-export const makeConfigQuery = () => {
-	return new URLSearchParams();
-};
-
-/**
- * Build query parameters for scenarios endpoint
- */
-export const makeScenariosQuery = () => {
-	return new URLSearchParams();
-};
-
-/**
- * Build query parameters for parameters endpoint
- */
-export const makeParametersQuery = () => {
-	return new URLSearchParams();
-};
-
-/**
- * Build query parameters for globals endpoint
- */
-export const makeGlobalsQuery = () => {
-	return new URLSearchParams();
 };
 
 /**

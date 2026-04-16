@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { formatNumber, getGeos, makeDemandQuery, makeGeographiesQuery } from './utilities';
+import { formatNumber, makeDemandQuery, makeGeographiesQuery } from './utilities';
 
 describe('formatNumber', () => {
 	test('formats small numbers without prefix', () => {
@@ -39,43 +39,6 @@ describe('formatNumber', () => {
 		expect(formatNumber(15, '', 'Wh')).toBe('15.0 Wh');
 		// num < 10 -> 2 decimal places
 		expect(formatNumber(5, '', 'Wh')).toBe('5.00 Wh');
-	});
-});
-
-describe('getGeos', () => {
-	test('transforms geography objects', () => {
-		const geos = [
-			{ geo_id: 'SE-01', geo_name: 'Stockholm' },
-			{ geo_id: 'SE-02', geo_name: 'Goteborg' }
-		];
-		const result = getGeos(geos);
-		expect(result).toHaveLength(2);
-		expect(result[0]).toHaveProperty('label');
-		expect(result[0]).toHaveProperty('value');
-	});
-
-	test('puts Sverige first', () => {
-		const geos = [
-			{ geo_id: 'SE-01', geo_name: 'Stockholm' },
-			{ geo_id: 'SE-00', geo_name: 'Sverige' },
-			{ geo_id: 'SE-02', geo_name: 'Goteborg' }
-		];
-		const result = getGeos(geos);
-		expect(result[0].label).toBe('Sverige');
-	});
-
-	test('filters out invalid entries', () => {
-		const geos = [
-			{ geo_id: 'SE-01', geo_name: 'Stockholm' },
-			{ geo_id: '', geo_name: '' },
-			{ geo_id: null, geo_name: null }
-		];
-		const result = getGeos(geos);
-		expect(result).toHaveLength(1);
-	});
-
-	test('handles empty array', () => {
-		expect(getGeos([])).toEqual([]);
 	});
 });
 

@@ -40,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>{content?.metadata?.title ? `${content.metadata.title} — Behovskartan` : 'Behovskartan'}</title>
+	<title>{content?.metadata?.title ? `${content.metadata.title} | Behovskartan` : 'Behovskartan'}</title>
 	{#if content?.metadata?.description}
 		<meta name="description" content={content.metadata.description} />
 	{/if}

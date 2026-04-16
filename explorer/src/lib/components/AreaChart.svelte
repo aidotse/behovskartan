@@ -224,7 +224,7 @@
 		}
 	}
 
-	// Domain calculations for single scenario mode - always show full range 2025-2045
+	// Domain calculations for single scenario mode - always show full range 2025-2050
 	let xMin = $derived(
 		chartData.length > 0
 			? Math.min(...chartData.map((d) => d.timestamp))

@@ -159,23 +159,6 @@ function createParameterStore() {
 		},
 
 		/**
-		 * Reset a specific segment's parameters to baseline
-		 */
-		resetSegment(segment: string) {
-			const segmentParams = state.config?.bySegment[segment] || [];
-			const updates: ParameterValues = {};
-
-			for (const param of segmentParams) {
-				updates[param.name] = 0;
-			}
-
-			state.parameterValues = {
-				...state.parameterValues,
-				...updates
-			};
-		},
-
-		/**
 		 * Get parameter value by name
 		 */
 		getParameterValue(paramName: string): number {
@@ -207,41 +190,6 @@ function createParameterStore() {
 		 */
 		get activeParameterCount(): number {
 			return Object.values(state.parameterValues).filter((v) => v > 0).length;
-		},
-
-		/**
-		 * Export current state for URL/sharing
-		 */
-		exportState(): { baseScenario: string; params: Record<string, number> } {
-			// Only include non-zero parameters
-			const activeParams: Record<string, number> = {};
-			for (const [name, value] of Object.entries(state.parameterValues)) {
-				if (value > 0) {
-					activeParams[name] = value;
-				}
-			}
-
-			return {
-				baseScenario: state.baseScenario,
-				params: activeParams
-			};
-		},
-
-		/**
-		 * Import state from URL/sharing
-		 */
-		importState(imported: { baseScenario?: string; params?: Record<string, number> }) {
-			if (imported.baseScenario) {
-				state.baseScenario = imported.baseScenario;
-			}
-
-			if (imported.params && state.config?.defaults) {
-				// Start with defaults, then apply imported values
-				state.parameterValues = {
-					...state.config.defaults,
-					...imported.params
-				};
-			}
 		}
 	};
 }

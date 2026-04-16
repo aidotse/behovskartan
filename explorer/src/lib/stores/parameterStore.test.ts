@@ -152,15 +152,6 @@ describe('parameterStore', () => {
 		expect(parameterStore.parameterValues).toEqual({ housing_growth: 0, transport_flex: 0 });
 	});
 
-	test('resetSegment resets only parameters in that segment', () => {
-		parameterStore.initialize(createMockConfig());
-		parameterStore.setParameterValues({ housing_growth: 2, transport_flex: 1 });
-		parameterStore.resetSegment('housing');
-
-		expect(parameterStore.parameterValues.housing_growth).toBe(0);
-		expect(parameterStore.parameterValues.transport_flex).toBe(1);
-	});
-
 	test('getParameterValue returns value by name', () => {
 		parameterStore.initialize(createMockConfig());
 		parameterStore.setParameterValue('housing_growth', 1);
@@ -209,36 +200,6 @@ describe('parameterStore', () => {
 	test('defaultScenario returns the default from config', () => {
 		parameterStore.initialize(createMockConfig());
 		expect(parameterStore.defaultScenario?.id).toBe('beslutad-policy');
-	});
-
-	test('exportState includes only non-zero parameters', () => {
-		parameterStore.initialize(createMockConfig());
-		parameterStore.setParameterValue('housing_growth', 2);
-
-		const exported = parameterStore.exportState();
-		expect(exported.baseScenario).toBe('beslutad-policy');
-		expect(exported.params).toEqual({ housing_growth: 2 });
-		expect(exported.params).not.toHaveProperty('transport_flex');
-	});
-
-	test('importState restores base scenario and parameters', () => {
-		parameterStore.initialize(createMockConfig());
-		parameterStore.importState({
-			baseScenario: 'high-growth',
-			params: { housing_growth: 1 }
-		});
-
-		expect(parameterStore.baseScenario).toBe('high-growth');
-		expect(parameterStore.parameterValues.housing_growth).toBe(1);
-		expect(parameterStore.parameterValues.transport_flex).toBe(0);
-	});
-
-	test('importState with only params preserves baseScenario', () => {
-		parameterStore.initialize(createMockConfig());
-		parameterStore.importState({ params: { transport_flex: 1 } });
-
-		expect(parameterStore.baseScenario).toBe('beslutad-policy');
-		expect(parameterStore.parameterValues.transport_flex).toBe(1);
 	});
 
 	test('getParameter returns parameter definition', () => {

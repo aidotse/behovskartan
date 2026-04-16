@@ -1,6 +1,6 @@
 ---
 title: Sveriges framtida elbehov
-description: Hur mycket el kommer Sverige att behöva år 2050 — och var och
+description: Hur mycket el kommer Sverige att behöva år 2050, och var och
   när behövs den? Det här verktyget visualiserar framtidens elanvändning
   uppdelat på regioner, sektorer och tid. Utforska olika scenarier för att
   se hur elektrifiering, industriomställning och ny teknik förändrar bilden.
@@ -14,7 +14,7 @@ description: Hur mycket el kommer Sverige att behöva år 2050 — och var och
 
 :::InsightBox{title="Ny el till nya behov"}
 I scenarierna kommer nästan hela ökningen från sektorer som idag knappt
-använder el. Det handlar inte om mer el till samma saker — utan om att
+använder el. Det handlar inte om mer el till samma saker, utan om att
 transporter, industri och datacenter kan tillkomma som stora nya elanvändare.
 :::
 
@@ -23,7 +23,7 @@ transporter, industri och datacenter kan tillkomma som stora nya elanvändare.
 ## Vilka sektorer driver förändringen?
 
 Idag dominerar bostäder och service elanvändningen. I scenarierna går
-transportsektorn — personbilar, lastbilar, bussar — från marginell
+transportsektorn (personbilar, lastbilar, bussar) från marginell
 elanvändning till att kunna stå för en betydande andel. Industrin
 elektrifierar processer som tidigare drevs av fossila bränslen, och
 datacenter kan växa som en helt ny kategori.
@@ -55,7 +55,7 @@ Utforska kartan för att se ditt län.
 :::InsightBox{title="Ojämn geografi"}
 Norra Sverige har produktionsöverskott men kan komma att möta stor ny
 efterfrågan från datacenter och grön industri. Södra Sverige har redan
-idag kapacitetsutmaningar — och det är där merparten av befolkningen bor.
+idag kapacitetsutmaningar, och det är där merparten av befolkningen bor.
 :::
 
 <!-- -->
@@ -66,8 +66,8 @@ Total årsförbrukning berättar bara halva historien. Lika viktigt är
 _när_ elen behövs. Skillnaderna kan vara stora: en kall vintermorgon kan
 effektbehovet vara flera gånger högre än en sommarnatt.
 
-Värmekurvan i diagrammet nedan visar dessa mönster. Vintern har tydliga
-toppar morgon och kväll — drivet av uppvärmning, belysning och
+Diagrammet nedan visar dessa mönster. Vintern har tydliga
+toppar morgon och kväll, drivet av uppvärmning, belysning och
 matlagning. Sommaren är jämnare och lägre. Det är vintertopparna som
 tenderar att dimensionera elnätet, inte sommarens lugna profil.
 
@@ -85,12 +85,13 @@ kan schemaläggas flexibelt.
 Om denna flexibilitet utnyttjas skulle gapet mellan topp och dal kunna
 minska. Det kan innebära att elnätet dimensioneras smalare, att mindre
 reservkapacitet behövs och att förnybar el i högre grad kan användas när
-den produceras som mest — inte bara när den efterfrågas som mest.
+den produceras som mest, inte bara när den efterfrågas som mest.
 
 ::ChartEmbed{chart="flex-peak-bars" exportable={false}}
 
-:::Comparison{value=6.9 unit="GW" unitValue=1.15 unitLabel="kärnreaktorer"}
-Baserat på genomsnittlig kapacitet för Sveriges sex reaktorer (~1,15 GW per reaktor).
+:::InsightBox{title="Satt i perspektiv"}
+Skillnaden i toppeffekt med och utan flexibilitet kan motsvara kapaciteten hos
+flera kärnreaktorer, utan att den totala energianvändningen förändras.
 :::
 
 ::HomeFooterCTA{}

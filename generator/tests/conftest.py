@@ -23,12 +23,6 @@ def sample_timestamps():
 
 
 @pytest.fixture
-def sample_daily_timestamps():
-    """Generate sample daily timestamps for one year."""
-    return pd.date_range("2025-01-01", "2025-12-31", freq="1D")
-
-
-@pytest.fixture
 def sample_demand_df(sample_timestamps):
     """Create a sample demand DataFrame."""
     n = len(sample_timestamps)
