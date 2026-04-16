@@ -93,7 +93,8 @@
 
 <style lang="postcss">
 	.insight-box :global(h3) {
-		@apply mt-0;
+		margin-top: 0 !important;
+		margin-bottom: 0.5rem !important;
 	}
 
 	.insight-content :global(p) {
