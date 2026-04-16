@@ -97,7 +97,10 @@
 	}
 
 	.insight-content :global(p) {
-		@apply mb-3 last:mb-0 first:mt-0;
+		@apply mb-3 last:mb-0;
+	}
+	.insight-content :global(p:first-child) {
+		margin-top: 0 !important;
 	}
 
 	.insight-content :global(ul),
