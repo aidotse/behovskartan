@@ -119,6 +119,23 @@ at container startup, not baked into the image. Full details in
 - **LayerChart fragility** — see the LayerChart Rules section in
   [CLAUDE.md](CLAUDE.md) before touching any chart component.
 
+## Historical DNS (pre-April 2026 cutover)
+
+Before production moved to AWS (CloudFront + App Runner), DNS in the
+`behovskartan.se` Route53 zone pointed at a Vercel deployment. Recorded
+here for audit / rollback purposes:
+
+| Record                       | Previous value           | TTL  | Current state                                   |
+|------------------------------|--------------------------|------|-------------------------------------------------|
+| `behovskartan.se` A          | `76.76.21.21` (Vercel)   | 3600 | ALIAS → `d17odiyb9bxu1y.cloudfront.net`         |
+| `www.behovskartan.se` A      | `76.76.21.21` (Vercel)   | 3600 | ALIAS → `d17odiyb9bxu1y.cloudfront.net`         |
+| `beta.behovskartan.se` CNAME | `cname.vercel-dns.com`   | 3600 | removed                                         |
+
+The Vercel project itself was left intact on the Datastory team account;
+only the DNS records above were changed. Restoring them would route
+traffic back to the prior Next.js deployment without needing to
+re-provision anything on Vercel.
+
 ## Where to ask questions
 
 Original author: Viktor Bengtsson (viktor@vkbn.ltd). The handover tarball
