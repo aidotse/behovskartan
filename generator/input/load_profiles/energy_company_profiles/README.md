@@ -19,10 +19,12 @@ A forker can reproduce sector-level load shapes from public data:
 - **Svenska kraftnät Mimer / Kontrollrummet** — Swedish grid load and per-area breakdowns.
 - **Energimyndigheten statistics** — sector splits (hushåll, industri, tjänster) for calibrating relative magnitudes.
 
-Rewrite the first cells of the notebook to load from the public source(s) of your choice. The downstream logic (grouping by hour, normalizing so each sector sums to 1.0 over 8760 hours) is unchanged.
+Rewrite the first cells of the notebook to load from the public source(s) of your choice. The downstream logic (normalizing each sector to sum to 1.0 over the full year) is unchanged.
 
 ## Profile schema
 
 Each output CSV has two columns:
-- `hour` — integer 0–8759
-- `value` — float, 8760 rows sum to 1.0
+- `hour` — integer, 0-based
+- `value` — float
+
+The row count matches the source data year: **8760 rows** for a non-leap year, **8784 rows** for a leap year (e.g. 2024). `value` sums to 1.0 across the full year. Preserve the leap-year hours — dropping Feb 29 would cascade a 1-day weekday misalignment through Mar–Dec downstream.

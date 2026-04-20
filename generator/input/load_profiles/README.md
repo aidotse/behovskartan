@@ -24,34 +24,24 @@ Each segment needs a parquet file with a normalized hourly profile:
 
 ## Profile Format
 
-Each profile should be a parquet file with:
-- 8760 rows (one per hour of a non-leap year)
-- Single column `value` with hourly weights
-- Values should sum to 1.0 (normalized)
+Each year-based profile is a CSV with two columns (`hour`, `value`):
+- **8760 rows** if the source data year is non-leap, **8784 rows** if it is leap (e.g. 2024).
+- `value` sums to 1.0 across the full year.
 
-## How to Create Profiles
-
-Use `generate_profiles.ipynb` to create profiles from historical data:
-
-```python
-# Example: Create housing profile from SVK data
-import pandas as pd
-
-# Load historical hourly data
-historical = pd.read_parquet('historical_demand.parquet')
-
-# Calculate average hourly pattern
-profile = historical.groupby(historical['timestamp'].dt.hour)['value'].mean()
-
-# Normalize to sum to 1.0
-profile = profile / profile.sum()
-
-# Save
-profile.to_parquet('housing.parquet')
-```
+Pattern-based profiles (transport, datacenters) are JSON with explicit
+`hourly`, `weekday`, and `monthly` arrays — see the individual
+`profile_*_patterns.json` files.
 
 ## Leap Year Handling
 
-Profiles are stored as 8760 hours. The generator handles leap years by:
-- Duplicating Feb 28 values for Feb 29
-- Re-normalizing to maintain sum of 1.0
+The generator (`behovskartan2.ipynb` Cell 14) builds a
+`(month, weekday, hour) → value` lookup by synthesizing timestamps from
+`source_year-01-01 + hour_index` and grouping. Leap-year hours fold
+naturally into the existing weekday buckets (Feb 29 2024 was a
+Thursday, so those 24 hours join the `(month=2, weekday=Thu, hour=X)`
+bucket alongside the other four Thursdays in Feb).
+
+**Do not drop Feb 29 from a leap-year source.** Compacting 8784 rows to
+8760 by removing Feb 29 reindexes every row from Mar 1 onwards, which
+silently mis-assigns each hour to the wrong weekday and cascades a
+1-day shift through Mar–Dec in the generated 2025–2050 parquet.
