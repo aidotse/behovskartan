@@ -87,6 +87,7 @@ jobs:
         env:
           VITE_API_BASE_URL: http://localhost:4010
           VITE_MAPBOX_TOKEN: ''
+          PUBLIC_MAPBOX_TOKEN: ''
           VITE_MAPBOX_STYLE_LIGHT: ''
         run: npm run build
       - name: Test
@@ -199,6 +200,7 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ vars.API_URL }}
           VITE_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+          PUBLIC_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
           VITE_MAPBOX_STYLE_LIGHT: ${{ vars.MAPBOX_STYLE_LIGHT }}
           VITE_ENV: ${{ needs.resolve-env.outputs.environment }}
         run: npm run build
